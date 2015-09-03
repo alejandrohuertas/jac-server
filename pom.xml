@@ -4,7 +4,7 @@
 	<groupId>jac-server</groupId>
 	<artifactId>jac-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Java Apllication Compiler Server</name>
+	<name>Java Application Compiler Server</name>
 	<build>
 		<plugins>
 			<plugin>
