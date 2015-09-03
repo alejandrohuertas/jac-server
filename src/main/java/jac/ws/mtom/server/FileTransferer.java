@@ -27,9 +27,10 @@ public class FileTransferer {
 	Logger logger = Logger.getLogger(getClass());
 	Properties prop = new Properties();
 	private final UnZip unZipper = new UnZip();
+	Boolean success = false;
 	
 	@WebMethod
-	public void upload(String fileName, byte[] imageBytes) {
+	public boolean upload(String fileName, byte[] imageBytes) {
 		InputStream input = null;
 		String filePath = null;
 		String folderPath = null;
@@ -54,6 +55,7 @@ public class FileTransferer {
 				
 				logger.info("Received file: " + filePath);
 				unzipFileAndCheck(filePath, folderPath);
+				return success;
 			} catch (IOException ex) {
 				logger.error("Error receiving sent file ", ex);
 				throw new WebServiceException(ex);
@@ -70,6 +72,7 @@ public class FileTransferer {
 		
 		try {
 			unZipper.unZipIt(filePath, outputFolder);
+			success = true;
 		} catch (IOException e) {
 			logger.error("ERROR extracting files from zip File "+ filePath, e);
 			e.printStackTrace();
