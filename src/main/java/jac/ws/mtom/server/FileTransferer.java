@@ -11,6 +11,8 @@ import javax.jws.WebService;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.soap.MTOM;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * A web service endpoint implementation that demonstrates the usage of
@@ -21,6 +23,8 @@ import javax.xml.ws.soap.MTOM;
 @MTOM(enabled = true, threshold = 10240)
 public class FileTransferer {
 	
+	
+	Logger logger = Logger.getLogger(getClass());
 	Properties prop = new Properties();
 	private final UnZip unZipper = new UnZip();
 	
@@ -32,11 +36,12 @@ public class FileTransferer {
 		//load a properties file from class path, inside static method
 		try {
 			String filename = "config.properties";
-			input = FileTransferer.class.getClassLoader().getResourceAsStream(filename);
+			input = getClass().getClassLoader().getResourceAsStream(filename);
 			prop.load(input);
 			folderPath = prop.getProperty("uploaded.files.folder");
 			filePath = folderPath + fileName;
 		} catch (IOException e) {
+			logger.error("Unable to establish the Uploaded files folder", e);
 			e.printStackTrace();
 		}
 
@@ -47,10 +52,10 @@ public class FileTransferer {
 				outputStream.write(imageBytes);
 				outputStream.close();
 				
-				System.out.println("Received file: " + filePath);
+				logger.info("Received file: " + filePath);
 				unzipFileAndCheck(filePath, folderPath);
 			} catch (IOException ex) {
-				System.err.println(ex);
+				logger.error("Error receiving sent file ", ex);
 				throw new WebServiceException(ex);
 			}
 		}
@@ -66,9 +71,8 @@ public class FileTransferer {
 		try {
 			unZipper.unZipIt(filePath, outputFolder);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block. LOGGING
+			logger.error("ERROR extracting files from zip File "+ filePath, e);
 			e.printStackTrace();
-			System.out.println("ERROR extracting files from zip File "+ filePath);
 		}
 	}
 	
