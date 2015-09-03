@@ -22,18 +22,19 @@ import javax.xml.ws.soap.MTOM;
 public class FileTransferer {
 	
 	Properties prop = new Properties();
+	private final UnZip unZipper = new UnZip();
 	
 	@WebMethod
 	public void upload(String fileName, byte[] imageBytes) {
 		InputStream input = null;
 		String filePath = null;
-		
+		String folderPath = null;
 		//load a properties file from class path, inside static method
 		try {
 			String filename = "config.properties";
 			input = FileTransferer.class.getClassLoader().getResourceAsStream(filename);
 			prop.load(input);
-			String folderPath = prop.getProperty("uploaded.files.folder");
+			folderPath = prop.getProperty("uploaded.files.folder");
 			filePath = folderPath + fileName;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -47,7 +48,7 @@ public class FileTransferer {
 				outputStream.close();
 				
 				System.out.println("Received file: " + filePath);
-				
+				unzipFileAndCheck(filePath, folderPath);
 			} catch (IOException ex) {
 				System.err.println(ex);
 				throw new WebServiceException(ex);
@@ -59,6 +60,19 @@ public class FileTransferer {
 		}
 	
 	}
+
+	private void unzipFileAndCheck (String filePath, String outputFolder){
+		
+		try {
+			unZipper.unZipIt(filePath, outputFolder);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block. LOGGING
+			e.printStackTrace();
+			System.out.println("ERROR extracting files from zip File "+ filePath);
+		}
+	}
+	
+	
 	
 	
 }
